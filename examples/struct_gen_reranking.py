@@ -9,6 +9,27 @@ from decoding.generators import BestOfN
 from decoding.models import LanguageModel
 from decoding.scorers import Scorer
 
+import dotenv
+import os
+import jax
+dotenv.load_dotenv()
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+
+if os.getenv("HF_TOKEN") is not None:
+    print("HF_TOKEN is set")
+    print(os.getenv("HF_TOKEN")[:10])
+    print(os.getenv("CUDA_VISIBLE_DEVICES"))
+    # Make sure that LD_LIBRARY_PATH is not set, since LD_LIBRARY_PATH can override the NVIDIA CUDA libraries.
+    os.environ.pop("LD_LIBRARY_PATH", None)
+    print(os.environ.get("LD_LIBRARY_PATH"))
+    os.environ['JAX_PLATFORMS'] = 'cuda,cpu'
+    print(f"JAX devices: {jax.devices()}")
+    print(f"JAX default backend: {jax.default_backend()}")
+
+else:
+    print("HF_TOKEN is not set")
+    exit()
+
 llm_small = LanguageModel.from_id(
     "allenai/OLMo-1B-hf", gpu_memory_utilization=0.2, enable_prefix_caching=True
 )
